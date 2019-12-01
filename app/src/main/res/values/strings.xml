@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TestPraktekDuithape</string>
+    <string-array name="role">
+        <item>1</item>
+        <item>4</item>
+    </string-array>
+</resources>
