@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.adityaayatusy.testpraktekduithape.adapter.AdapterListUsers;
-import com.adityaayatusy.testpraktekduithape.adapter.AdapterScroll;
 import com.adityaayatusy.testpraktekduithape.api.ApiServer;
 import com.adityaayatusy.testpraktekduithape.api.ResponsApi;
 import com.adityaayatusy.testpraktekduithape.model.DataModel;
@@ -34,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rv;
     LinearLayoutManager lm;
     AdapterListUsers adapter;
-    ProgressBar pb;
     List<UserModel> allData = new ArrayList<UserModel>();
     Button load;
     public int current_page = 0;
+    public int last = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +49,26 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.add_btn);
         load = findViewById(R.id.load);
-        pb = findViewById(R.id.main_loading);
         rv = findViewById(R.id.rv);
         lm = new LinearLayoutManager(MainActivity.this);
         rv.setLayoutManager(lm);
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if(lm.getItemCount()-1 == lm.findLastVisibleItemPosition()){
+                    if(last == 0){
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                nextLoad();
+                            }
+                        },1000);
+                    }
+                    last = 1;
 
+                }
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,15 +80,6 @@ public class MainActivity extends AppCompatActivity {
         api = new ApiServer().getClient().create(ResponsApi.class);
 
         firstLoad();
-
-        load.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nextLoad();
-            }
-        });
-
-
     }
 
     public void firstLoad(){
@@ -101,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         res.enqueue(new Callback<DataModel>() {
             @Override
             public void onResponse(Call<DataModel> call, Response<DataModel> response) {
-                pb.setVisibility(View.GONE);
                 List<UserModel> data = response.body().getContent();
                 allData.addAll(data);
                 adapter.notifyDataSetChanged();
