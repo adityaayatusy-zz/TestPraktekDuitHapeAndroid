@@ -53,10 +53,12 @@ public class AdapterListUsers extends RecyclerView.Adapter<AdapterListUsers.Adap
 
     @Override
     public int getItemCount() {
-        return users == null ? 0 : users.size() + 1;
+        return users.size() + 1;
     }
 
     public int getItemViewType(int position) {
+        Log.d("test", " "+users.size());
+        Log.d("test1", " "+position);
         if(position == users.size()){
             return VIEW_TYPE_LOADING = 1;
         }else{

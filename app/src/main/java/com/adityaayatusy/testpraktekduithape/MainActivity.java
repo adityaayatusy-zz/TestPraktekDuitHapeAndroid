@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rv;
     LinearLayoutManager lm;
     AdapterListUsers adapter;
+    ProgressBar pb;
     List<UserModel> allData = new ArrayList<UserModel>();
-    Button load;
     public int current_page = 0;
     public int last = 0;
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.actionbar);
 
         FloatingActionButton fab = findViewById(R.id.add_btn);
-        load = findViewById(R.id.load);
+        pb = findViewById(R.id.main_loading);
         rv = findViewById(R.id.rv);
         lm = new LinearLayoutManager(MainActivity.this);
         rv.setLayoutManager(lm);
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if(lm.getItemCount()-1 == lm.findLastVisibleItemPosition()){
+                    Log.d("last", "onScrolled: "+last);
                     if(last == 0){
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -64,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         },1000);
                     }
+
                     last = 1;
+
 
                 }
             }
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void nextLoad(){
-        current_page++;
+        current_page += 1;
         Call<DataModel> res = api.getUsers(current_page,10);
         res.enqueue(new Callback<DataModel>() {
             @Override
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 List<UserModel> data = response.body().getContent();
                 allData.addAll(data);
                 adapter.notifyDataSetChanged();
+                last = 0;
             }
 
             @Override
@@ -125,12 +129,12 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Keluar")
                 .setMessage("Apa anda yakin?")
                 .setCancelable(true)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Iya", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
                         System.exit(0);
                     }
-                }).setNegativeButton("No",null).show();
+                }).setNegativeButton("Tidak",null).show();
     }
 }
