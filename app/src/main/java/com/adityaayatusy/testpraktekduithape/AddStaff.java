@@ -1,23 +1,40 @@
 package com.adityaayatusy.testpraktekduithape;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatSpinner;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adityaayatusy.testpraktekduithape.api.ApiServer;
+import com.adityaayatusy.testpraktekduithape.api.ResponsApi;
+import com.adityaayatusy.testpraktekduithape.model.SendUserModel;
+import com.adityaayatusy.testpraktekduithape.model.UserModel;
+
 import java.lang.reflect.Field;
 
-public class AddStaff extends AppCompatActivity implements View.OnClickListener{
-    TextInputLayout name,email,address,phone,password;
-    Spinner role;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class AddStaff extends AppCompatActivity implements View.OnClickListener {
+    TextInputLayout name, email, address, phone, password;
+    AppCompatSpinner role;
+    String iName, iEmail, iAddress, iPhone, iPassword;
+    int iRoleId = 1;
     Button save;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +45,12 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        name =      findViewById(R.id.layout_input_name);
-        email =     findViewById(R.id.layout_input_email);
-        address =   findViewById(R.id.layout_input_address);
-        phone   =   findViewById(R.id.layout_input_phone);
-        password =  findViewById(R.id.layout_input_password);
+        name = findViewById(R.id.layout_input_name);
+        email = findViewById(R.id.layout_input_email);
+        address = findViewById(R.id.layout_input_address);
+        phone = findViewById(R.id.layout_input_phone);
+        password = findViewById(R.id.layout_input_password);
+        role = findViewById(R.id.roleId);
         save = findViewById(R.id.save);
 
         save.setOnClickListener(this);
@@ -45,58 +63,47 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener{
         return true;
     }
 
-    public boolean validateName(){
-        if(name.getEditText().getText().toString().trim().isEmpty()){
+    public boolean validateName() {
+        if (iName.isEmpty()) {
             name.setError("Field tidak boleh kosong");
             return false;
-        }else{
+        } else {
             name.setError(null);
             return true;
         }
     }
 
-    public boolean validateEmail(){
+    public boolean validateEmail() {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-        String e = email.getEditText().getText().toString().trim();
 
-        if(e.isEmpty()){
+        if (iEmail.isEmpty()) {
             email.setError("Field tidak boleh kosong");
             return false;
-        }else if(!e.matches(emailPattern)){
+        } else if (!iEmail.matches(emailPattern)) {
             email.setError("Email tidak valid!");
             return false;
-        }else{
+        } else {
             email.setError(null);
             return true;
         }
     }
 
-    public boolean validateAddress(){
-        if(address.getEditText().getText().toString().trim().isEmpty()){
-            address.setError("Field tidak boleh kosong");
-            return false;
-        }else{
-            address.setError(null);
-            return true;
-        }
-    }
-
-    public boolean validatePhone(){
-        if(phone.getEditText().getText().toString().trim().isEmpty()){
+    public boolean validatePhone() {
+        if (iPhone.isEmpty()) {
             phone.setError("Field tidak boleh kosong");
             phone.getBoxCornerRadiusBottomEnd();
             return false;
-        }else{
+        } else {
             phone.setError(null);
             return true;
         }
     }
 
-    public boolean validatePassword(){
-        if(password.getEditText().getText().toString().trim().isEmpty()){
+    public boolean validatePassword() {
+        if (iPassword.isEmpty()) {
             password.setError("Field tidak boleh kosong");
             return false;
-        }else{
+        } else {
             password.setError(null);
             return true;
         }
@@ -104,14 +111,67 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.save:
-                if(!validateName() | !validateAddress() | !validateEmail() | !validatePhone() | !validatePassword()){
-                    return;
-                }else{
-                    Toast.makeText(AddStaff.this, "Berhasil", Toast.LENGTH_SHORT).show();
-                }
+                save_jadwal();
                 break;
+
+        }
+    }
+
+    public void save_jadwal() {
+        iName = name.getEditText().getText().toString().trim();
+        iEmail = email.getEditText().getText().toString().trim();
+        iAddress = address.getEditText().getText().toString().trim();
+        iPhone = phone.getEditText().getText().toString().trim();
+        iPassword = password.getEditText().getText().toString().trim();
+
+        role.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                iRoleId = Integer.parseInt(parent.getItemAtPosition(position).toString());
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                iRoleId = 1;
+            }
+        });
+
+        if (!validateName() | !validateEmail() | !validatePhone() | !validatePassword()) {
+            return;
+        } else {
+            pd = new ProgressDialog(this);
+            pd.setMessage("Mengirim Data...");
+            pd.show();
+
+            SendUserModel sum = new SendUserModel(iName,iEmail,iPhone,iAddress,iPassword,iRoleId);
+            ResponsApi api = new ApiServer().getClient().create(ResponsApi.class);
+            final Call<UserModel> res = api.addUsers(sum);
+              res.enqueue(new Callback<UserModel>() {
+                @Override
+                public void onResponse(Call<UserModel> call, Response<UserModel> response) {
+                    pd.hide();
+
+                    if(response.body() == null){
+                        phone.setError("Nomor Sudah Terdaftar!");
+                        Toast.makeText(AddStaff.this, "Gagal: Phone has already been registered", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(AddStaff.this, "Berhasil", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(AddStaff.this,MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserModel> call, Throwable t) {
+                    pd.hide();
+                    Log.d("Debug", t.getMessage().toString());
+                    Toast.makeText(AddStaff.this, "Gagal koneksi", Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
     }
 }
+

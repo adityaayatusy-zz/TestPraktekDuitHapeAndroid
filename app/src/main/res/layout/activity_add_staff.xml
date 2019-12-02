@@ -125,7 +125,7 @@
                     android:text="IssuerRole" />
 
                 <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/categorySpinner"
+                    android:id="@+id/roleId"
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

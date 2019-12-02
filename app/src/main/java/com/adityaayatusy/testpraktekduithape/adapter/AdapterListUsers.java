@@ -3,13 +3,11 @@ package com.adityaayatusy.testpraktekduithape.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.adityaayatusy.testpraktekduithape.R;
 import com.adityaayatusy.testpraktekduithape.model.UserModel;
 
@@ -57,8 +55,6 @@ public class AdapterListUsers extends RecyclerView.Adapter<AdapterListUsers.Adap
     }
 
     public int getItemViewType(int position) {
-        Log.d("test", " "+users.size());
-        Log.d("test1", " "+position);
         if(position == users.size()){
             return VIEW_TYPE_LOADING = 1;
         }else{

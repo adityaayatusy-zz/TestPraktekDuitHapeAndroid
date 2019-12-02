@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayoutManager lm;
     AdapterListUsers adapter;
     ProgressBar pb;
+    Button reload;
     List<UserModel> allData = new ArrayList<UserModel>();
     public int current_page = 0;
     public int last = 0;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.add_btn);
         pb = findViewById(R.id.main_loading);
         rv = findViewById(R.id.rv);
+        reload = findViewById(R.id.reload);
+
         lm = new LinearLayoutManager(MainActivity.this);
         rv.setLayoutManager(lm);
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -83,6 +86,14 @@ public class MainActivity extends AppCompatActivity {
         api = new ApiServer().getClient().create(ResponsApi.class);
 
         firstLoad();
+
+        reload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pb.setVisibility(View.VISIBLE);
+                firstLoad();
+            }
+        });
     }
 
     public void firstLoad(){
@@ -99,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataModel> call, Throwable t) {
+                pb.setVisibility(View.GONE);
+                reload.setVisibility(View.VISIBLE)
                 Log.d("error",t.getMessage().toString());
             }
         });
