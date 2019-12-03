@@ -5,28 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class DataModel {
-    @SerializedName("content")
-    List<UserModel> content;
-    @SerializedName("totalPages")
-    int totalPages;
-    @SerializedName("totalElements")
-    int totalElements;
-    @SerializedName("numberOfElements")
-    int numberOfElements;
-    @SerializedName("size")
-    int size;
-    @SerializedName("number")
-    int number;
-    @SerializedName("lastPage")
-    boolean lastPage;
-    @SerializedName("firstPage")
-    boolean firstPage;
-    @SerializedName("last")
-    boolean last;
-    @SerializedName("sort")
-    boolean sort;
-    @SerializedName("first")
-    boolean first;
+    public List<UserModel> content;
+    public int totalPages,totalElements,numberOfElements,size,number;
+    public boolean lastPage,firstPage,last,sort,first;
 
     public List<UserModel> getContent() {
         return content;

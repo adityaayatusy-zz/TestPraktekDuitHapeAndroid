@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.adityaayatusy.testpraktekduithape.adapter.AdapterListUsers;
 import com.adityaayatusy.testpraktekduithape.api.ApiServer;
@@ -29,14 +30,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
-    ResponsApi api;
-    RecyclerView rv;
-    LinearLayoutManager lm;
-    AdapterListUsers adapter;
-    ProgressBar pb;
-    Button reload;
-    List<UserModel> allData = new ArrayList<UserModel>();
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    public ResponsApi api;
+    public RecyclerView rv;
+    public LinearLayoutManager lm;
+    public AdapterListUsers adapter;
+    public ProgressBar pb;
+    public Button reload;
+    public TextView notice;
+    public List<UserModel> allData = new ArrayList<UserModel>();
     public int current_page = 0;
     public int last = 0;
 
@@ -45,21 +47,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //action bar
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.actionbar);
 
+        //init widget
         FloatingActionButton fab = findViewById(R.id.add_btn);
         pb = findViewById(R.id.main_loading);
         rv = findViewById(R.id.rv);
         reload = findViewById(R.id.reload);
+        notice = findViewById(R.id.notice);
 
         lm = new LinearLayoutManager(MainActivity.this);
         rv.setLayoutManager(lm);
+        //event ketika di scroll
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                //mengecek posisi terakhir list item
                 if(lm.getItemCount()-1 == lm.findLastVisibleItemPosition()){
-                    Log.d("last", "onScrolled: "+last);
                     if(last == 0){
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -68,34 +74,23 @@ public class MainActivity extends AppCompatActivity {
                             }
                         },1000);
                     }
-
                     last = 1;
-
-
                 }
             }
         });
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddStaff.class);
-                startActivity(intent);
-            }
-        });
 
+        //init api
         api = new ApiServer().getClient().create(ResponsApi.class);
 
+        //load data
         firstLoad();
 
-        reload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pb.setVisibility(View.VISIBLE);
-                firstLoad();
-            }
-        });
+        //button
+        fab.setOnClickListener(this);
+        reload.setOnClickListener(this);
     }
 
+    //load data pertama
     public void firstLoad(){
         Call<DataModel> res = api.getUsers(current_page,10);
         res.enqueue(new Callback<DataModel>() {
@@ -111,14 +106,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<DataModel> call, Throwable t) {
                 pb.setVisibility(View.GONE);
-                reload.setVisibility(View.VISIBLE)
+                reload.setVisibility(View.VISIBLE);
+                notice.setVisibility(View.VISIBLE);
                 Log.d("error",t.getMessage().toString());
             }
         });
     }
 
+    //load data selanjutnya
     public void nextLoad(){
-        current_page += 1;
+        current_page++;
         Call<DataModel> res = api.getUsers(current_page,10);
         res.enqueue(new Callback<DataModel>() {
             @Override
@@ -149,5 +146,20 @@ public class MainActivity extends AppCompatActivity {
                         System.exit(0);
                     }
                 }).setNegativeButton("Tidak",null).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.reload :  pb.setVisibility(View.VISIBLE);
+                                notice.setVisibility(View.GONE);
+                                reload.setVisibility(View.GONE);
+                                firstLoad();
+                                break;
+            case R.id.add_btn:  Intent intent = new Intent(MainActivity.this, AddStaff.class);
+                                startActivity(intent);
+                                break;
+        }
     }
 }

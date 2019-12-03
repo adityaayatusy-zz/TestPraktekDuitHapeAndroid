@@ -145,7 +145,7 @@
                 android:textStyle="bold"
                 android:textSize="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="Save" />
+                android:text="simpan" />
         </LinearLayout>
     </ScrollView>
 

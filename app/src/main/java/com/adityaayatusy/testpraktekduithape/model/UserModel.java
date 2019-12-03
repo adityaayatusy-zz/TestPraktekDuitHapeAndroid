@@ -1,10 +1,11 @@
 package com.adityaayatusy.testpraktekduithape.model;
 
-public class UserModel {
+import com.google.gson.annotations.SerializedName;
 
-    String name,email,phone,address,password;
-    int issuerRoleId;
-    RoleModel issuerRole;
+public class UserModel {
+    public String name,email,phone,address,password;
+    public int issuerRoleId;
+    public RoleModel issuerRole;
 
 
     public String getEmail() {

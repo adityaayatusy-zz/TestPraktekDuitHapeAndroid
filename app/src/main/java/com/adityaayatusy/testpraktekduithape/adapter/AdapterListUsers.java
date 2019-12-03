@@ -15,8 +15,8 @@ import java.util.List;
 
 public class AdapterListUsers extends RecyclerView.Adapter<AdapterListUsers.AdapterListHolder>{
 
-    List<UserModel> users;
-    Context context;
+    public List<UserModel> users;
+    public Context context;
     private int VIEW_TYPE_LOADING = 0;
 
     public AdapterListUsers(List<UserModel> users, Context context) {
@@ -41,7 +41,6 @@ public class AdapterListUsers extends RecyclerView.Adapter<AdapterListUsers.Adap
         if(i >= users.size()){
             adapterListHolder.pb.setVisibility(View.VISIBLE);
         }else{
-            final UserModel u = users.get(i);
             adapterListHolder.name.setText(users.get(i).getName());
             adapterListHolder.email.setText(users.get(i).getEmail());
             adapterListHolder.role.setText(users.get(i).getIssuerRole().getName().toLowerCase());

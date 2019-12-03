@@ -1,8 +1,8 @@
 package com.adityaayatusy.testpraktekduithape.model;
 
 public class SendUserModel {
-    String name,email,phone,address,password;
-    int issuerRoleId;
+    public String name,email,phone,address,password;
+    public int issuerRoleId;
 
     public SendUserModel(String name, String email, String phone, String address, String password, int issuerRoleId) {
         this.name = name;

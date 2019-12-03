@@ -1,8 +1,7 @@
 package com.adityaayatusy.testpraktekduithape.model;
 
 public class RoleModel {
-
-    String name;
+    public String name;
 
     public String getName() {
         return name;

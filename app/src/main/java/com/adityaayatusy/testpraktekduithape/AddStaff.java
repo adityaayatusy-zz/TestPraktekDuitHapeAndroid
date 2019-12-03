@@ -7,14 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adityaayatusy.testpraktekduithape.api.ApiServer;
@@ -22,29 +17,30 @@ import com.adityaayatusy.testpraktekduithape.api.ResponsApi;
 import com.adityaayatusy.testpraktekduithape.model.SendUserModel;
 import com.adityaayatusy.testpraktekduithape.model.UserModel;
 
-import java.lang.reflect.Field;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AddStaff extends AppCompatActivity implements View.OnClickListener {
-    TextInputLayout name, email, address, phone, password;
-    AppCompatSpinner role;
-    String iName, iEmail, iAddress, iPhone, iPassword;
-    int iRoleId = 1;
-    Button save;
-    ProgressDialog pd;
+    //inisialisasi variabel
+    public TextInputLayout name, email, address, phone, password;
+    public AppCompatSpinner role;
+    public String iName, iEmail, iAddress, iPhone, iPassword;
+    public int iRoleId = 1;
+    public Button save;
+    public ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_staff);
 
+        //action bar
         getSupportActionBar().setTitle("Add Staff");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        //init widget
         name = findViewById(R.id.layout_input_name);
         email = findViewById(R.id.layout_input_email);
         address = findViewById(R.id.layout_input_address);
@@ -53,16 +49,17 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
         role = findViewById(R.id.roleId);
         save = findViewById(R.id.save);
 
+        //action button
         save.setOnClickListener(this);
 
     }
-
+    //tobol batal
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }
-
+    //cek input nama
     public boolean validateName() {
         if (iName.isEmpty()) {
             name.setError("Field tidak boleh kosong");
@@ -72,7 +69,7 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
             return true;
         }
     }
-
+    //cek input email
     public boolean validateEmail() {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
@@ -87,7 +84,7 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
             return true;
         }
     }
-
+    //cek input nomor
     public boolean validatePhone() {
         if (iPhone.isEmpty()) {
             phone.setError("Field tidak boleh kosong");
@@ -98,7 +95,7 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
             return true;
         }
     }
-
+    //cek input password
     public boolean validatePassword() {
         if (iPassword.isEmpty()) {
             password.setError("Field tidak boleh kosong");
@@ -120,6 +117,7 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
     }
 
     public void save_jadwal() {
+
         iName = name.getEditText().getText().toString().trim();
         iEmail = email.getEditText().getText().toString().trim();
         iAddress = address.getEditText().getText().toString().trim();
@@ -140,6 +138,7 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
         if (!validateName() | !validateEmail() | !validatePhone() | !validatePassword()) {
             return;
         } else {
+            //ProgressDialog
             pd = new ProgressDialog(this);
             pd.setMessage("Mengirim Data...");
             pd.show();
@@ -150,8 +149,9 @@ public class AddStaff extends AppCompatActivity implements View.OnClickListener 
               res.enqueue(new Callback<UserModel>() {
                 @Override
                 public void onResponse(Call<UserModel> call, Response<UserModel> response) {
-                    pd.hide();
+                    pd.hide(); pd.dismiss();
 
+                    //cek respons api
                     if(response.body() == null){
                         phone.setError("Nomor Sudah Terdaftar!");
                         Toast.makeText(AddStaff.this, "Gagal: Phone has already been registered", Toast.LENGTH_SHORT).show();
